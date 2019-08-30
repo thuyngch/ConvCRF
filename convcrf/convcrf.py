@@ -32,7 +32,7 @@ except ImportError:
     has_pyinn = False
     pass
 
-from utils import test_utils
+from ..utils import test_utils
 
 import torch
 import torch.nn as nn

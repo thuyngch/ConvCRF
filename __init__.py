@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 import torch
 import numpy as np
-from convcrf import convcrf
+from .convcrf import convcrf
 
 
 #------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ class ConvCRF(object):
 			prediction = self.gausscrf.forward(unary=unary_var, img=img_var)
 			prediction = prediction[0].data.cpu().numpy()
 			result = np.argmax(prediction, axis=0)
-			return result
+			return result.astype('uint8')
 
 
 #------------------------------------------------------------------------------
