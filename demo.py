@@ -4,39 +4,15 @@ The MIT License (MIT)
 Copyright (c) 2017 Marvin Teichmann
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-import os
-import sys
-
 import numpy as np
-import imageio
-# import scipy as scp
-# import scipy.misc
-
-import argparse
-
-import logging
-import time
-
-from convcrf import convcrf
+import os, sys, argparse, imageio, logging, time
 
 import torch
 from torch.autograd import Variable
 
-from utils import pascal_visualizer as vis
+from convcrf import convcrf
 from utils import synthetic
-
-try:
-    import matplotlib.pyplot as plt
-    figure = plt.figure()
-    matplotlib = True
-    plt.close(figure)
-except:
-    matplotlib = False
-    pass
+from utils import pascal_visualizer as vis
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.INFO,
@@ -44,7 +20,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 
 
 def do_crf_inference(image, unary, args):
-
+    print("args.pyinn:", args.pyinn)
     if args.pyinn or not hasattr(torch.nn.functional, 'unfold'):
         # pytorch 0.3 or older requires pyinn.
         args.pyinn = True
@@ -58,6 +34,7 @@ def do_crf_inference(image, unary, args):
     config['filter_size'] = 7
     config['pyinn'] = args.pyinn
 
+    print("args.normalize:", args.normalize)
     if args.normalize:
         # Warning, applying image normalization affects CRF computation.
         # The parameter 'col_feats::schan' needs to be adapted.
@@ -134,6 +111,8 @@ def plot_results(image, unary, prediction, label, args):
     prediction_hard = np.argmax(prediction, axis=0)
     coloured_crf = myvis.id2color(id_image=prediction_hard)
 
+    matplotlib = False
+    print("matplotlib:", matplotlib)
     if matplotlib:
         # Plot results using matplotlib
         figure = plt.figure()
@@ -229,7 +208,9 @@ if __name__ == '__main__':
     label = imageio.imread(args.label)
 
     # Produce unary by adding noise to label
-    unary = synthetic.augment_label(label, num_classes=21)
+    unary = synthetic.augment_label(label, num_classes=5)
+    # unary = label.astype('float64')
+    print(unary.dtype, unary.shape)
     # Compute CRF inference
     prediction = do_crf_inference(image, unary, args)
     # Plot output
